@@ -1,0 +1,76 @@
+name: PR Validation
+
+on: pull_request
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v2.3.4
+      - name: Setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2.5.2
+        with:
+          version: v1.44.0
+
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v2.3.4
+      - name: Setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17"
+      - name: Run fmt
+        run: |
+          make fmt
+      - name: Check if working tree is dirty
+        run: |
+          if [[ $(git status --porcelain) ]]; then
+            git diff
+            echo 'run make fmt and commit changes'
+            exit 1
+          fi
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v2.3.4
+      - name: Setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17"
+      - name: Run test
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          TENANT_ID: ${{ secrets.TENANT_ID }}
+          CONTAINER_REGISTRY_NAME: ${{ secrets.CONTAINER_REGISTRY_NAME }}
+        run: |
+          make test
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v2.3.4
+      - name: Setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17"
+      - name: coverage
+        env:
+          CI: true
+        run: |
+          make cover
+      - name: Send coverage to coverall
+        uses: shogo82148/actions-goveralls@v1.5.1
+        with:
+          path-to-profile: tmp/coverage.out
