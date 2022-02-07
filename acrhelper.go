@@ -130,33 +130,16 @@ func newCachedAuthorizer(ctx context.Context, cfg config) (auth.Authorizer, erro
 		}
 	}
 
-	fmt.Fprint(os.Stderr, "------------------------------------------\n")
-	clientIDParts := strings.Split(cfg.ClientID, "-")
-	if len(clientIDParts) != 0 {
-		fmt.Fprintf(os.Stderr, "Client ID: %s-***-%s\n", clientIDParts[0], clientIDParts[len(clientIDParts)-1])
-	}
-
-	tenantIDParts := strings.Split(cfg.TenantID, "-")
-	if len(tenantIDParts) != 0 {
-		fmt.Fprintf(os.Stderr, "Tenant ID: %s-***-%s\n", tenantIDParts[0], tenantIDParts[len(tenantIDParts)-1])
-	}
-
-	fmt.Fprintf(os.Stderr, "GitHub Token: %s\n", cfg.gitHubToken)
-	fmt.Fprintf(os.Stderr, "GitHub Token URL: %s\n", cfg.gitHubTokenURL)
-
 	if cfg.gitHubToken != "" || cfg.gitHubTokenURL != "" {
 		authorizer, err = auth.NewGitHubOIDCAuthorizer(ctx, cfg.Environment, cfg.Environment.ResourceManager, cfg.TenantID, cfg.AuxiliaryTenantIDs, cfg.ClientID, cfg.gitHubTokenURL, cfg.gitHubToken)
-		fmt.Fprintf(os.Stderr, "GitHub Authorizer error: %v\n", err)
 		if err == nil {
 			cachedAuthorizer := auth.NewCachedAuthorizer(authorizer)
 			_, err := cachedAuthorizer.Token()
-			fmt.Fprintf(os.Stderr, "GitHub cached authorizer token error: %v\n", err)
 			if err == nil {
 				return cachedAuthorizer, nil
 			}
 		}
 	}
-	fmt.Fprint(os.Stderr, "------------------------------------------\n")
 
 	authorizer, err = auth.NewAzureCliAuthorizer(ctx, cfg.Environment.ResourceManager, cfg.TenantID)
 	if err == nil {
