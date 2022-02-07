@@ -46,6 +46,7 @@ test:
 .SILENT: cover
 cover:
 	set -e
+	mkdir -p tmp/
 	go test -timeout 1m ./... -coverprofile=tmp/coverage.out
 	if [[ "$${CI}" == "" ]]; then
 		go tool cover -html=tmp/coverage.out
