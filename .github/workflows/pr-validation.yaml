@@ -55,8 +55,8 @@ jobs:
       - name: Run test
         env:
           CI: true
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          TENANT_ID: ${{ secrets.TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.TENANT_ID }}
           CONTAINER_REGISTRY_NAME: ${{ secrets.CONTAINER_REGISTRY_NAME }}
         run: |
           make test
@@ -73,8 +73,8 @@ jobs:
   #     - name: coverage
   #       env:
   #         CI: true
-  #         CLIENT_ID: ${{ secrets.CLIENT_ID }}
-  #         TENANT_ID: ${{ secrets.TENANT_ID }}
+  #         AZURE_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+  #         AZURE_TENANT_ID: ${{ secrets.TENANT_ID }}
   #         CONTAINER_REGISTRY_NAME: ${{ secrets.CONTAINER_REGISTRY_NAME }}
   #       run: |
   #         make cover
