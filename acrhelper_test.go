@@ -28,17 +28,17 @@ func TestACRHelperE2E(t *testing.T) {
 
 	serverURL := fmt.Sprintf("%s.azurecr.io", containerRegistryName)
 
-	// without cached authorizer
-	_, _ = testACRHelperGet(t, serverURL, 30*time.Second, false)
+	// without caching the authorizer at construction
+	_, _ = testACRHelperGet(t, serverURL, WithTimeout(30*time.Second), WithCacheAuthorizerAtConstruction(false))
 
-	// with cached authorizer
-	helper, password := testACRHelperGet(t, serverURL, 30*time.Second, true)
+	// with caching the authorizer at construction
+	helper, password := testACRHelperGet(t, serverURL, WithTimeout(30*time.Second))
 	testNotImplemetedMethods(t, helper)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	cr := containerregistry.NewContainerRegistryClient(helper.cachedAuthorizer, serverURL, "")
+	cr := containerregistry.NewContainerRegistryClient(helper.authorizer, serverURL, "")
 	scopes := containerregistry.AccessTokenScopes{
 		{
 			Type:    "registry",
@@ -62,10 +62,10 @@ func TestACRHelperE2E(t *testing.T) {
 	}
 }
 
-func testACRHelperGet(t *testing.T, serverURL string, timeout time.Duration, cacheAuthorizer bool) (*ACRHelper, string) {
+func testACRHelperGet(t *testing.T, serverURL string, setters ...Option) (*ACRHelper, string) {
 	t.Helper()
 
-	helper := NewACRHelper(timeout, cacheAuthorizer)
+	helper := NewACRHelper(setters...)
 	testNotImplemetedMethods(t, helper)
 
 	username, password, err := helper.Get(serverURL)
