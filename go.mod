@@ -5,7 +5,7 @@ go 1.17
 replace github.com/manicminer/hamilton => github.com/simongottschlag/hamilton v0.3.1-0.20220207200020-abaab85cdea4
 
 require (
-	github.com/docker/docker-credential-helpers v0.6.4
+	github.com/docker/docker-credential-helpers v0.7.0
 	github.com/manicminer/hamilton v0.0.0-00010101000000-000000000000
 )
 
